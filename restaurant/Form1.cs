@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using restaurant.DBCon;
+using restaurant.BuilderBurger;
 
 namespace restaurant
 {
@@ -15,6 +17,40 @@ namespace restaurant
         public Form1()
         {
             InitializeComponent();
+        }
+
+        Model1 model = new Model1();
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        private void ButtonAdd_Click(object sender, EventArgs e)
+        {
+            BurgerBuilder burgerBuilder = new BurgerBuilder(); 
+            BurgerDirector burgerDirector = new BurgerDirector(burgerBuilder);
+            
+            if (ComboBoxBurger.SelectedItem.ToString() == "Бургер стандартный") 
+                burgerDirector.BuildDefault();
+            else
+                burgerDirector.BuildWithBacon();
+            try
+            {
+                model.Burgers.Add(burgerBuilder.GetBurgers());
+                model.SaveChanges();
+            }
+                catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            ComboBoxBurger.SelectedIndex = 0;
+            dataGridView1.DataSource = model.Burgers.ToList();
         }
     }
 }
